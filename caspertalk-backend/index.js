@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import Message from './models/Message.js'; // 1. Import your database layout blueprint
+import { getCasperBalance } from './services/casperService.js';
 
 dotenv.config();
 
@@ -57,6 +58,33 @@ app.get('/api/messages', async (req, res) => {
   } catch (error) {
     console.error('❌ Error fetching history:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// THE BLOCKCHAIN READ ROUTE
+app.get('/api/blockchain/balance/:publicKey', async (req, res) => {
+  try {
+    const { publicKey } = req.params;
+
+    if (!publicKey) {
+      return res.status(400).json({ error: 'Public Key parameter is required' });
+    }
+
+    console.log(`⛓️ Querying Casper Testnet ledger for wallet: ${publicKey.substring(0, 8)}...`);
+    
+    // Call our Web3 service script to fetch the balance from the node
+    const balance = await getCasperBalance(publicKey);
+
+    // Return the real blockchain data to the frontend layout
+    res.json({
+      success: true,
+      network: "casper-testnet",
+      walletAddress: publicKey,
+      balanceCSPR: balance
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to retrieve on-chain data metrics' });
   }
 });
 
