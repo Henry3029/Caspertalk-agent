@@ -1,9 +1,11 @@
-import { CasperServiceByJsonRPC } from 'casper-js-sdk';
+import casperSdk from 'casper-js-sdk';
 import dotenv from 'dotenv';
 
+// 2. Now you can run config and destructure variables safely below them
 dotenv.config();
+const { CasperServiceByJsonRPC } = casperSdk;
 
-// Initialize the connector pointing to the public Casper Testnet RPC node
+// 3. Initialize your RPC connection
 const rpcUrl = process.env.CASPER_TESTNET_RPC || "https://rpc.testnet.casper.live/rpc";
 const casperService = new CasperServiceByJsonRPC(rpcUrl);
 
