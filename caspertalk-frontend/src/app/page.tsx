@@ -10,78 +10,110 @@ interface Message {
   id?: string;
   sender: 'user' | 'ai';
   text: string;
-  timestamp?: string; // 👈 Add this line to satisfy ChatWindow
+  timestamp?: string; //Add this line to satisfy ChatWindow
 }
 
 export default function MainDashboardPage() {
   const [history, setHistory] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
+  const [metrics, setMetrics] = useState({
+  balance: 0,
+  riskLevel: 'Low Risk' as 'Low Risk' | 'Medium Risk' | 'High Risk',
+  aiAnalysis: 'Enter a prompt to inspect live Casper Network data.'
+});
+  
   // A test public key wallet address to pass to our backend
   const userPublicKey = "01a0bcce1234567890abcdef1234567890abcdef1234567890abcdef1234567890";
 
-  // 1. INITIAL LOAD ROUTINE: Pull existing chat logs from MongoDB when page opens
-  useEffect(() => {
-    async function loadChatHistory() {
-      try {
-        const response = await fetch('http://localhost:5000/api/messages');
-        if (response.ok) {
-          const storedLogs = await response.json();
-          // Map MongoDB formatting safely to our frontend state array
-          setHistory(storedLogs.map((msg: any) => ({
-            id: msg._id,
-            sender: msg.sender,
-            text: msg.text
-          })));
-        }
-      } catch (error) {
-        console.error("Could not fetch historical logs from data layer:", error);
-      }
-    }
-    loadChatHistory();
-  }, []);
-
-  // 2. LIVE SEND ROUTINE: Ship prompt to Node.js and await the AI response
-  const handleSendMessage = async (userText: string) => {
-    // Optimistically add user bubble to screen instantly
-    const localUserMsg: Message = { sender: 'user', text: userText };
-    setHistory((prev) => [...prev, localUserMsg]);
-    
-    // Activate our localized spinner state
-    setIsLoading(true);
-
+ // 1. INITIAL LOAD ROUTINE: Pull existing logs when the app opens
+useEffect(() => {
+  async function loadChatHistory() {
     try {
-      // Dispatch the payload over the local network pipe
-      const response = await fetch('http://localhost:5000/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sender: 'user',
-          text: userText,
-          publicKey: userPublicKey // Pass public key context to ground the agent
-        })
-      });
+      const response = await fetch('http://localhost:5000/api/messages');
+      if (response.ok) {
+        const storedLogs = await response.json();
+        
+        setHistory(storedLogs.map((msg: any) => ({
+          id: msg._id || crypto.randomUUID(), // Map MongoDB _id safely
+          sender: msg.sender === 'user' ? 'user' : 'ai',
+          text: msg.text,
+          timestamp: new Date(msg.createdAt || msg.timestamp || Date.now()) // Parse ISO string to true Date object
+        })));
 
-      if (!response.ok) throw new Error("Server transmission error");
-
-      const data = await response.json();
-
-      // If the backend returned a processed AI response, add it to the timeline
-      if (data.aiResponse) {
-        setHistory((prev) => [...prev, data.aiResponse]);
+        // If the latest message contains updated metrics from Casper, apply it to the dashboard
+        const latestAiLog = [...storedLogs].reverse().find(msg => msg.sender === 'ai');
+        if (latestAiLog && latestAiLog.metrics) {
+          setMetrics({
+            balance: latestAiLog.metrics.balance || 0,
+            riskLevel: latestAiLog.metrics.riskLevel || 'Low Risk',
+            aiAnalysis: latestAiLog.text
+          });
+        }
       }
-
     } catch (error) {
-      console.error("Data pipeline broken:", error);
-      setHistory((prev) => [...prev, { 
-        sender: 'ai', 
-        text: "Connection Alert: Lost tracking communication with the local Node.js engine server." 
-      }]);
-    } finally {
-      // Shut off the spinner once the transmission closes
-      setIsLoading(false);
+      console.error("Could not fetch historical logs from data layer:", error);
     }
+  }
+  loadChatHistory();
+}, []);
+
+ const handleSendMessage = async (userText: string) => {
+  const localUserMsg: Message = { 
+    id: crypto.randomUUID(),
+    sender: 'user', 
+    text: userText,
+    timestamp: new Date() 
   };
+  
+  setHistory((prev) => [...prev, localUserMsg]);
+  setIsLoading(true);
+
+  try {
+    const response = await fetch('http://localhost:5000/api/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sender: 'user',
+        text: userText,
+        publicKey: userPublicKey 
+      }),
+    });
+
+    if (!response.ok) throw new Error("Server transmission error");
+    const data = await response.json();
+
+    // Expecting your backend to return the final text response along with blockchain metrics
+    if (data.aiResponse) {
+      setHistory((prev) => [...prev, {
+        id: data.aiResponse._id || crypto.randomUUID(),
+        sender: 'ai',
+        text: data.aiResponse.text,
+        timestamp: new Date()
+      }]);
+
+      // Map real chain metrics directly from your backend logic response!
+      if (data.aiResponse.metrics) {
+        setMetrics({
+          balance: data.aiResponse.metrics.balance,
+          riskLevel: data.aiResponse.metrics.riskLevel,
+          aiAnalysis: data.aiResponse.text
+        });
+      }
+    }
+
+  } catch (error) {
+    console.error("Data pipeline broken:", error);
+    setHistory((prev) => [...prev, {
+      id: crypto.randomUUID(),
+      sender: 'ai',
+      text: "Connection Alert: Lost tracking communication with the agent logic.",
+      timestamp: new Date()
+    }]);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="flex flex-col h-screen bg-slate-950 text-slate-100 max-w-md mx-auto overflow-hidden">
@@ -89,7 +121,13 @@ export default function MainDashboardPage() {
         <h1 className="text-xl font-bold text-center">Casper<span className="text-amber-400">Talk AI</span></h1>
       </header>
 
-      <DashboardMetrics walletAddress={userPublicKey} />
+   <DashboardMetrics 
+  walletAddress={userPublicKey} 
+  balance={metrics.balance} 
+  riskLevel={metrics.riskLevel} 
+  aiAnalysis={metrics.aiAnalysis} 
+  isLoading={isLoading}
+/>
 
       <div className="flex-1 min-h-0 p-4">
         <ChatWindow messages={history} />
