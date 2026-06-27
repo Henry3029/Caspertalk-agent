@@ -31,7 +31,7 @@ export default function MainDashboardPage() {
   useEffect(() => {
     async function loadChatHistory() {
       try {
-        const response = await fetch('http://localhost:5000/api/messages');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/messages`);
         if (response.ok) {
           const storedLogs = await response.json();
           
@@ -72,7 +72,7 @@ export default function MainDashboardPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/messages', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
