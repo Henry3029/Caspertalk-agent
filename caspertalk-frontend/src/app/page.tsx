@@ -7,9 +7,10 @@ import ChatInput from '@/components/ChatInput';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface Message {
-  id?: string; // MongoDB generates dynamic string IDs (like _id)
+  id?: string;
   sender: 'user' | 'ai';
   text: string;
+  timestamp?: string; // 👈 Add this line to satisfy ChatWindow
 }
 
 export default function MainDashboardPage() {
@@ -88,7 +89,7 @@ export default function MainDashboardPage() {
         <h1 className="text-xl font-bold text-center">Casper<span className="text-amber-400">Talk AI</span></h1>
       </header>
 
-      <DashboardMetrics />
+      <DashboardMetrics walletAddress={userPublicKey} />
 
       <div className="flex-1 min-h-0 p-4">
         <ChatWindow messages={history} />
@@ -102,7 +103,7 @@ export default function MainDashboardPage() {
         </div>
       )}
 
-      <ChatInput onSend={handleSendMessage} />
+      <ChatInput onSendMessage={handleSendMessage} />
     </div>
   );
 }
