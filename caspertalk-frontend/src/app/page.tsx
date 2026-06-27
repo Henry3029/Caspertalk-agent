@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import DashboardMetrics from '@/components/DashboardMetrics';
 import ChatWindow from '@/components/ChatWindow';
-import ChatInput from './components/ChatInput';
+import ChatInput from '@/components/ChatInput';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface Message {
