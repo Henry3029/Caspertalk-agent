@@ -1,65 +1,215 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import DashboardMetrics from '@/components/DashboardMetrics';
+import ChatWindow from '@/components/ChatWindow';
+import ChatInput from '@/components/ChatInput';
+import LoadingSpinner from '@/components/LoadingSpinner';
+
+interface Message {
+  id?: string; // MongoDB generates dynamic string IDs (like _id)
+  sender: 'user' | 'ai';
+  text: string;
+}
+
+export default function MainDashboardPage() {
+  const [history, setHistory] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // A test public key wallet address to pass to our backend
+  const userPublicKey = "01a0bcce1234567890abcdef1234567890abcdef1234567890abcdef1234567890";
+
+  // 1. INITIAL LOAD ROUTINE: Pull existing chat logs from MongoDB when page opens
+  useEffect(() => {
+    async function loadChatHistory() {
+      try {
+        const response = await fetch('http://localhost:5000/api/messages');
+        if (response.ok) {
+          const storedLogs = await response.json();
+          // Map MongoDB formatting safely to our frontend state array
+          setHistory(storedLogs.map((msg: any) => ({
+            id: msg._id,
+            sender: msg.sender,
+            text: msg.text
+          })));
+        }
+      } catch (error) {
+        console.error("Could not fetch historical logs from data layer:", error);
+      }
+    }
+    loadChatHistory();
+  }, []);
+
+  // 2. LIVE SEND ROUTINE: Ship prompt to Node.js and await the AI response
+  const handleSendMessage = async (userText: string) => {
+    // Optimistically add user bubble to screen instantly
+    const localUserMsg: Message = { sender: 'user', text: userText };
+    setHistory((prev) => [...prev, localUserMsg]);
+    
+    // Activate our localized spinner state
+    setIsLoading(true);
+
+    try {
+      // Dispatch the payload over the local network pipe
+      const response = await fetch('http://localhost:5000/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender: 'user',
+          text: userText,
+          publicKey: userPublicKey // Pass public key context to ground the agent
+        })
+      });
+
+      if (!response.ok) throw new Error("Server transmission error");
+
+      const data = await response.json();
+
+      // If the backend returned a processed AI response, add it to the timeline
+      if (data.aiResponse) {
+        setHistory((prev) => [...prev, data.aiResponse]);
+      }
+
+    } catch (error) {
+      console.error("Data pipeline broken:", error);
+      setHistory((prev) => [...prev, { 
+        sender: 'ai', 
+        text: "Connection Alert: Lost tracking communication with the local Node.js engine server." 
+      }]);
+    } finally {
+      // Shut off the spinner once the transmission closes
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col h-screen bg-slate-950 text-slate-100 max-w-md mx-auto overflow-hidden">
+      <header className="p-4 border-b border-slate-900 bg-slate-900/50">
+        <h1 className="text-xl font-bold text-center">Casper<span className="text-amber-400">Talk AI</span></h1>
+      </header>
+
+      <DashboardMetrics />
+
+      <div className="flex-1 min-h-0 p-4">
+        <ChatWindow messages={history} />
+      </div>
+
+      {/* Show an inline subtle indicator if the agent is compiling network data */}
+      {isLoading && (
+        <div className="flex items-center gap-2 px-6 py-2 text-xs text-amber-400/70 font-mono animate-pulse">
+          <LoadingSpinner />
+          <span>Agent 'use client';
+
+import { useState, useEffect } from 'react';
+import DashboardMetrics from '@/components/DashboardMetrics';
+import ChatWindow from '@/components/ChatWindow';
+import ChatInput from '@/components/ChatInput';
+import LoadingSpinner from '@/components/LoadingSpinner';
+
+interface Message {
+  id?: string; // MongoDB generates dynamic string IDs (like _id)
+  sender: 'user' | 'ai';
+  text: string;
+}
+
+export default function MainDashboardPage() {
+  const [history, setHistory] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // A test public key wallet address to pass to our backend
+  const userPublicKey = "01a0bcce1234567890abcdef1234567890abcdef1234567890abcdef1234567890";
+
+  // 1. INITIAL LOAD ROUTINE: Pull existing chat logs from MongoDB when page opens
+  useEffect(() => {
+    async function loadChatHistory() {
+      try {
+        const response = await fetch('http://localhost:5000/api/messages');
+        if (response.ok) {
+          const storedLogs = await response.json();
+          // Map MongoDB formatting safely to our frontend state array
+          setHistory(storedLogs.map((msg: any) => ({
+            id: msg._id,
+            sender: msg.sender,
+            text: msg.text
+          })));
+        }
+      } catch (error) {
+        console.error("Could not fetch historical logs from data layer:", error);
+      }
+    }
+    loadChatHistory();
+  }, []);
+
+  // 2. LIVE SEND ROUTINE: Ship prompt to Node.js and await the AI response
+  const handleSendMessage = async (userText: string) => {
+    // Optimistically add user bubble to screen instantly
+    const localUserMsg: Message = { sender: 'user', text: userText };
+    setHistory((prev) => [...prev, localUserMsg]);
+    
+    // Activate our localized spinner state
+    setIsLoading(true);
+
+    try {
+      // Dispatch the payload over the local network pipe
+      const response = await fetch('http://localhost:5000/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender: 'user',
+          text: userText,
+          publicKey: userPublicKey // Pass public key context to ground the agent
+        })
+      });
+
+      if (!response.ok) throw new Error("Server transmission error");
+
+      const data = await response.json();
+
+      // If the backend returned a processed AI response, add it to the timeline
+      if (data.aiResponse) {
+        setHistory((prev) => [...prev, data.aiResponse]);
+      }
+
+    } catch (error) {
+      console.error("Data pipeline broken:", error);
+      setHistory((prev) => [...prev, { 
+        sender: 'ai', 
+        text: "Connection Alert: Lost tracking communication with the local Node.js engine server." 
+      }]);
+    } finally {
+      // Shut off the spinner once the transmission closes
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-screen bg-slate-950 text-slate-100 max-w-md mx-auto overflow-hidden">
+      <header className="p-4 border-b border-slate-900 bg-slate-900/50">
+        <h1 className="text-xl font-bold text-center">Casper<span className="text-amber-400">Talk AI</span></h1>
+      </header>
+
+      <DashboardMetrics />
+
+      <div className="flex-1 min-h-0 p-4">
+        <ChatWindow messages={history} />
+      </div>
+
+      {/* Show an inline subtle indicator if the agent is compiling network data */}
+      {isLoading && (
+        <div className="flex items-center gap-2 px-6 py-2 text-xs text-amber-400/70 font-mono animate-pulse">
+          <LoadingSpinner />
+          <span>Agent parsing Casper state blocks...</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      )}
+
+      <ChatInput onSend={handleSendMessage} />
+    </div>
+  );
+} Casper state blocks...</span>
         </div>
-      </main>
+      )}
+
+      <ChatInput onSend={handleSendMessage} />
     </div>
   );
 }
