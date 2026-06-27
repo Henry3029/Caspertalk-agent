@@ -1,4 +1,4 @@
-import { CasperServiceByJsonRPC } from 'casper-js-sdk';
+import casperSdk from 'casper-js-sdk';
 import dotenv from 'dotenv';
 
 dotenv.config();
