@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import Message from './models/Message.js'; // 1. Import your database layout blueprint
 import { getCasperBalance } from './services/casperService.js';
+import { generateAgentResponse } from './services/aiService.js';
 
 dotenv.config();
 
@@ -21,43 +22,50 @@ mongoose.connect(mongoURI)
 
 // --- ⚙️ NEW DATABASE ROUTES START HERE ---
 
-// 2. THE CHAT INTAKE ROUTE (Saves incoming text from the phone)
 app.post('/api/messages', async (req, res) => {
   try {
-    const { sender, text } = req.body; // Unpack the values sent from the Next.js app
+    const { sender, text, publicKey } = req.body; 
 
-    // Guardrail: Make sure the message isn't empty or malformed
     if (!sender || !text) {
-      return res.status(400).json({ error: 'Missing required fields: sender or text' });
+      return res.status(400).json({ error: 'Missing required parameters' });
     }
 
-    // Wrap the data in our Mongoose blueprint
-    const newMessage = new Message({
-      sender,
-      text
+    // 1. Save the User's incoming prompt bubble into MongoDB
+    const userMessage = new Message({ sender: 'user', text });
+    await userMessage.save();
+
+    let aiResponseText = "";
+
+    // 2. If this is a user input message, trigger the Agentic logic chain
+    if (sender === 'user') {
+      
+      // Fetch a mock or real asset block state context to ground the AI's data calculations
+      // (Later, your frontend will pass the active public key straight inside the req.body)
+      const blockchainContext = {
+        walletAddress: publicKey || "01a0bc...MockWalletAddressHex...",
+        balanceCSPR: 2450.75 
+      };
+
+      // Pass the text prompt and the blockchain info directly to Gemini
+      aiResponseText = await generateAgentResponse(text, blockchainContext);
+
+      // 3. Commit the AI's generated response directly to MongoDB
+      const aiMessage = new Message({
+        sender: 'ai',
+        text: aiResponseText
+      });
+      await aiMessage.save();
+    }
+
+    // 4. Return both the user submission acknowledgment and the real AI response payload!
+    res.status(201).json({
+      userMessage,
+      aiResponse: aiResponseText ? { sender: 'ai', text: aiResponseText } : null
     });
 
-    // Fire it off to save permanently inside your MongoDB cloud cluster!
-    const savedMessage = await newMessage.save();
-
-    // Send the saved record back to the frontend to confirm success
-    res.status(201).json(savedMessage);
-
   } catch (error) {
-    console.error('❌ Error saving message:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-// 3. THE HISTORY RETRIEVAL ROUTE (Fetches all old messages when the app reloads)
-app.get('/api/messages', async (req, res) => {
-  try {
-    // Look into the database collection and find all records, sorted by time
-    const chatHistory = await Message.find().sort({ timestamp: 1 });
-    res.json(chatHistory);
-  } catch (error) {
-    console.error('❌ Error fetching history:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('❌ Comprehensive pipeline routing failure:', error);
+    res.status(500).json({ error: 'Internal Server Routing Error' });
   }
 });
 
