@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-//import dotenv from 'dotenv';
+import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import Message from './models/Message.js'; // 1. Import your database layout blueprint
 import { getCasperBalance } from './services/casperService.js';
 import { generateAgentResponse } from './services/aiService.js';
 
-//dotenv.config({ path: './.env' });
+dotenv.config({ path: './.env' });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
