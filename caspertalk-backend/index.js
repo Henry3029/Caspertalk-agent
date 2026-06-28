@@ -6,7 +6,7 @@ import Message from './models/Message.js'; // 1. Import your database layout blu
 import { getCasperBalance } from './services/casperService.js';
 import { generateAgentResponse } from './services/aiService.js';
 
-dotenv.config({ path: './.env' });
+dotenv.config({ path: '../.env' });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
