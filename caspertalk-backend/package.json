@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-  "dev": "nodemon --experimental-modules --import dotenv/config index.js"
+"dev": "nodemon --env-file=.env index.js"
   },
   "keywords": [],
   "author": "",
