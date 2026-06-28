@@ -5,6 +5,11 @@ import mongoose from 'mongoose';
 import Message from './models/Message.js'; // 1. Import your database layout blueprint
 import { getCasperBalance } from './services/casperService.js';
 import { generateAgentResponse } from './services/aiService.js';
+console.log("-----------------------------------------");
+console.log("🕵️‍♂️ ENV TEST LOGS:");
+console.log("Raw MONGODB_URI String:", process.env.MONGODB_URI);
+console.log("Raw GEMINI_API_KEY String:", process.env.GEMINI_API_KEY ? "🔑 Key is Present" : "❌ Key is Missing/Undefined");
+console.log("-----------------------------------------");
 
 //dotenv.config({ path: '../.env' });
 
