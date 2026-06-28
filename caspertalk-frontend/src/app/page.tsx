@@ -82,7 +82,11 @@ export default function MainDashboardPage() {
         }),
       });
 
-      if (!response.ok) throw new Error("Server transmission error");
+      if (!response.ok) {
+  // Capture status code and any custom error message from backend
+  const errBody = await response.json().catch(() => ({}));
+  throw new Error(`Server Error (${response.status}): ${errBody.error || response.statusText || 'Transmission failed'}`);
+}
       const data = await response.json();
 
       // Catch real backend response payload
