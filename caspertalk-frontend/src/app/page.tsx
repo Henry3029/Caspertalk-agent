@@ -118,11 +118,12 @@ export default function MainDashboardPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-slate-950 text-slate-100 max-w-md mx-auto overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100 max-w-md mx-auto relative">
       <header className="p-4 border-b border-slate-900 bg-slate-900/50">
         <h1 className="text-xl font-bold text-center">Casper<span className="text-amber-400">Talk AI</span></h1>
       </header>
 
+<div className="p-4 pt-6 space-y-4">
       <DashboardMetrics 
         walletAddress={userPublicKey} 
         balance={metrics.balance} 
@@ -130,10 +131,11 @@ export default function MainDashboardPage() {
         aiAnalysis={metrics.aiAnalysis} 
         isLoading={isLoading}
       />
+</div>
 
-      <div className="flex-1 min-h-0 p-4">
-        <ChatWindow messages={history} />
-      </div>
+    <div className="flex-1 min-h-0 p-4 pb-24">
+  <ChatWindow messages={history} />
+</div>
 
       {/* Show an inline subtle indicator if the agent is compiling network data */}
       {isLoading && (

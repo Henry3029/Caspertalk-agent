@@ -20,9 +20,9 @@ export default function ChatInput({ onSendMessage, disabled = false }: ChatInput
 
   return (
     <form 
-      onSubmit={handleSubmit} 
-      className="w-full max-w-md mx-auto flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-200 shadow-sm"
-    >
+  onSubmit={handleSubmit} 
+  className="fixed bottom-0 left-0 right-0 z-10 w-full max-w-md mx-auto flex items-center space-x-2 bg-white p-4 border-t border-gray-200/80 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]"
+>
       <input
         type="text"
         value={inputText}
