@@ -72,15 +72,17 @@ export default function MainDashboardPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sender: 'user',
-          text: userText,
-          publicKey: userPublicKey 
-        }),
-      });
+      const response = await fetch('https://gf55x6-5000.app.github.dev/api/messages', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    sender: 'user',
+    text: inputMessage,
+    publicKey: walletAddress || "" // Pass your wallet state here
+  })
+});
 
       if (!response.ok) {
   // Capture status code and any custom error message from backend
