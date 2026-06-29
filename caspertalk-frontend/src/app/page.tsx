@@ -72,7 +72,7 @@ export default function MainDashboardPage() {
 
     try {
       // ✅ Swapped variables to match your exact parameter scope names!
-      const response = await fetch('https://bug-free-giggle-69p5ww495v4gf55x6-5000.app.github.dev/', {
+      const response = await fetch('http://bug-free-giggle-69p5ww495v4gf55x6-5000.app.github.dev/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
