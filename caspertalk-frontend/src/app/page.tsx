@@ -122,42 +122,43 @@ export default function MainDashboardPage() {
   };
 
   return (
-    /* 📱 Changed min-h-screen to rigid h-screen for absolute container layout pinning */
-    <div className="h-screen w-full flex flex-col overflow-hidden bg-slate-950 text-slate-100">
-      
-      {/* 📋 FIXED HEADER */}
-      <header className="p-4 border-b border-slate-900 bg-slate-900/50 shrink-0 z-10">
-        <h1 className="text-xl font-bold text-center">Casper<span className="text-amber-400">Talk AI</span></h1>
-      </header>
+  /* 📱 Clean Light Mode Workspace Wrapper */
+  <div className="h-screen w-full flex flex-col overflow-hidden bg-gray-100 text-gray-900">
+    
+    {/* 📋 FIXED HEADER */}
+    <header className="p-4 border-b border-gray-200 bg-white shrink-0 z-10">
+      <h1 className="text-xl font-bold text-center text-gray-900">
+        Casper<span className="text-indigo-600">Talk AI</span>
+      </h1>
+    </header>
 
-      {/* 📊 FIXED DASHBOARD METRICS */}
-      <div className="shrink-0 z-10">
-        <DashboardMetrics 
-          walletAddress={userPublicKey} 
-          balance={metrics.balance} 
-          riskLevel={metrics.riskLevel} 
-          aiAnalysis={metrics.aiAnalysis} 
-          isLoading={isLoading}
-        />
-      </div>
-
-      {/* 💬 TELEGRAM-STYLE INLINE SCROLL WINDOW */}
-      <div className="flex-1 min-h-0 w-full relative">
-        <ChatWindow messages={history} />
-      </div>
-
-      {/* Show an inline subtle indicator if the agent is compiling network data */}
-      {isLoading && (
-        <div className="flex items-center gap-2 px-6 py-2 text-xs text-amber-400/70 font-mono animate-pulse shrink-0">
-          <LoadingSpinner />
-          <span>Agent parsing Casper state blocks...</span>
-        </div>
-      )}
-
-      {/* ⌨️ STICKY INPUT FOOTER */}
-      <div className="shrink-0">
-        <ChatInput onSendMessage={handleSendMessage} />
-      </div>
+    {/* 📊 FIXED DASHBOARD METRICS */}
+    <div className="shrink-0 z-10 bg-white border-b border-gray-200">
+      <DashboardMetrics 
+        walletAddress={userPublicKey} 
+        balance={metrics.balance} 
+        riskLevel={metrics.riskLevel} 
+        aiAnalysis={metrics.aiAnalysis} 
+        isLoading={isLoading}
+      />
     </div>
-  );
-}
+
+    {/* 💬 TELEGRAM-STYLE INLINE SCROLL WINDOW */}
+    <div className="flex-1 min-h-0 w-full relative bg-gray-50">
+      <ChatWindow messages={history} />
+    </div>
+
+    {/* Show an inline subtle indicator if the agent is compiling network data */}
+    {isLoading && (
+      <div className="flex items-center gap-2 px-6 py-2 text-xs text-indigo-600 font-sans bg-white border-t border-gray-100 animate-pulse shrink-0">
+        <LoadingSpinner />
+        <span>Agent parsing Casper state blocks...</span>
+      </div>
+    )}
+
+    {/* ⌨️ STICKY INPUT FOOTER */}
+    <div className="shrink-0 bg-white border-t border-gray-200">
+      <ChatInput onSendMessage={handleSendMessage} />
+    </div>
+  </div>
+);

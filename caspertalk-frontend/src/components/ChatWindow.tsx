@@ -21,7 +21,11 @@ export default function ChatWindow({ messages, isAiTyping = false }: ChatWindowP
   }, [messages, isAiTyping]);
 
   return (
-    <div className="w-full flex flex-col h-full bg-gray-50 rounded-xl border border-gray-100 shadow-inner overflow-hidden space-y-3">
+  /* 1. Outer Frame: Claims 100% width and height allocated by page.tsx */
+  <div className="absolute inset-0 w-full h-full flex flex-col bg-gray-50 rounded-xl border border-gray-100 shadow-inner overflow-hidden">
+    
+    {/* 2. Isolated Scrollable Box: Only this section tracks vertically */}
+    <div className="flex-1 min-h-0 w-full overflow-y-auto p-4 space-y-3">
       {messages.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center p-6">
           <p className="font-serif text-sm text-gray-400 italic">
@@ -49,7 +53,7 @@ export default function ChatWindow({ messages, isAiTyping = false }: ChatWindowP
                     isUser ? 'text-indigo-200' : 'text-gray-400'
                   }`}
                 >
-                  {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {msg.timestamp?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || ""}
                 </span>
               </div>
             </div>
@@ -57,13 +61,13 @@ export default function ChatWindow({ messages, isAiTyping = false }: ChatWindowP
         })
       )}
 
-      {/* 🧠 AI Loading Bubble Indicator */}
+      {/* 🧠 AI Loading Bubble Indicator sits perfectly inside the scroll zone flow */}
       {isAiTyping && (
-        <div className="flex w-full justify-start">
+        <div className="flex w-full justify-start pt-1">
           <div className="bg-white text-gray-500 border border-gray-100 rounded-2xl rounded-bl-none px-4 py-3 text-sm shadow-sm flex items-center space-x-1">
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
           </div>
         </div>
       )}
@@ -71,5 +75,7 @@ export default function ChatWindow({ messages, isAiTyping = false }: ChatWindowP
       {/* Invisible anchor point used by the auto-scroll pipeline */}
       <div ref={bottomRef} />
     </div>
-  );
+
+  </div>
+);
 }

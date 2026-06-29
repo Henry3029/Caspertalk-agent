@@ -37,21 +37,22 @@ export default function DashboardMetrics({
   }
 
   return (
-  <div className="w-full max-w-md mx-auto p-2 space-y-3">
+  /* 📱 Removed max-w-md and mx-auto so it spans 100% of the screen width */
+  <div className="w-full p-3 space-y-3 bg-white">
     {/* 👑 Elegant Section Header */}
-    <h2 className="font-serif text-xl font-bold text-gray-900 tracking-tight">
+    <h2 className="font-serif text-lg font-bold text-gray-900 tracking-tight px-1">
       Account Metrics
     </h2>
     
-    <hr className="border-gray-200" />
+    <hr className="border-gray-100" />
 
     {/* 🎛️ Side-by-Side Wallet & Indicator Row */}
-    <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between gap-3">
+    <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between gap-4">
       <div className="min-w-0 flex-1">
         <span className="font-sans text-[10px] font-semibold text-gray-400 tracking-wider uppercase block">
           Active Wallet
         </span>
-        <p className="font-mono text-xs text-gray-700 font-medium break-all mt-1 bg-gray-50 p-1.5 rounded border border-gray-100 truncate">
+        <p className="font-mono text-xs text-gray-700 font-medium mt-1 bg-gray-50 p-1.5 rounded border border-gray-100 truncate">
           {walletAddress ? `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 6)}` : 'Not Connected'}
         </p>
       </div>
@@ -67,7 +68,7 @@ export default function DashboardMetrics({
       </div>
     </div>
 
-    {/* AI Insights Section */}
+    {/* 🧠 AI Insights Section */}
     <div className="bg-gradient-to-br from-gray-50 to-white p-3 rounded-xl border border-gray-100 shadow-sm space-y-1">
       <span className="font-sans text-[10px] font-semibold text-gray-400 tracking-wider uppercase block">
         AI Agent Diagnostic
