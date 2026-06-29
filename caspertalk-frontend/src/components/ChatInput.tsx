@@ -22,7 +22,7 @@ export default function ChatInput({ onSendMessage, disabled = false }: ChatInput
     <form 
   onSubmit={handleSubmit} 
   className="w-full flex items-center space-x-2 bg-white p-4 border-t border-gray-200/80 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
->
+
       <input
         type="text"
         value={inputText}
