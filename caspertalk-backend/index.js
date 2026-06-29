@@ -16,7 +16,15 @@ console.log("-----------------------------------------");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://gf55x6.github.dev', 
+    'https://gf55x6-3000.app.github.dev', // standard port 3000 mapping if active
+    'http://localhost:3000'
+  ],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // MongoDB Connection
