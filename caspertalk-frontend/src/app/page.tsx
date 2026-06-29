@@ -122,12 +122,12 @@ export default function MainDashboardPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100 max-w-md mx-auto relative">
-      <header className="p-4 border-b border-slate-900 bg-slate-900/50">
+    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100 w-full overflow-hidden">
+      <header className="p-4 border-b border-slate-900 bg-slate-900/50 shrink-0 z-10">
         <h1 className="text-xl font-bold text-center">Casper<span className="text-amber-400">Talk AI</span></h1>
       </header>
 
-<div className="p-4 pt-6 space-y-4">
+<div className="shrink-0 bg-white border-b border-gray-100 z-10">
       <DashboardMetrics 
         walletAddress={userPublicKey} 
         balance={metrics.balance} 
@@ -137,7 +137,7 @@ export default function MainDashboardPage() {
       />
 </div>
 
-    <div className="flex-1 min-h-0 p-4 pb-24">
+  <div className="flex-1 min-h-0 w-full relative">
   <ChatWindow messages={history} />
 </div>
 

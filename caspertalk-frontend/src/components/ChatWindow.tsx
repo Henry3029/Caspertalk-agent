@@ -21,7 +21,7 @@ export default function ChatWindow({ messages, isAiTyping = false }: ChatWindowP
   }, [messages, isAiTyping]);
 
   return (
-    <div className="w-full max-w-md mx-auto flex flex-col h-[400px] bg-gray-50 rounded-xl border border-gray-100 shadow-inner overflow-y-auto p-4 space-y-3">
+    <div className="w-full flex flex-col h-full bg-gray-50 rounded-xl border border-gray-100 shadow-inner overflow-hidden space-y-3">
       {messages.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center p-6">
           <p className="font-serif text-sm text-gray-400 italic">

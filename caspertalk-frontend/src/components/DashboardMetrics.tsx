@@ -37,63 +37,46 @@ export default function DashboardMetrics({
   }
 
   return (
-    <div className="w-full max-w-md mx-auto p-4 space-y-4">
-      {/* 👑 Elegant Section Header */}
-      <h2 className="font-serif text-2xl font-bold text-gray-900 tracking-tight">
-        Account Metrics
-      </h2>
-      
-      <hr className="border-gray-200" />
+  <div className="w-full max-w-md mx-auto p-2 space-y-3">
+    {/* 👑 Elegant Section Header */}
+    <h2 className="font-serif text-xl font-bold text-gray-900 tracking-tight">
+      Account Metrics
+    </h2>
+    
+    <hr className="border-gray-200" />
 
-      {/* 🎛️ Responsive Stats Grid Layout */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        
-        {/* Card 1: Wallet Address Info */}
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between">
-          <span className="font-sans text-xs font-semibold text-gray-400 tracking-wider uppercase">
-            Active Wallet
-          </span>
-          <p className="font-sans text-sm text-gray-700 font-medium break-all mt-2 bg-gray-50 p-2 rounded border border-gray-100">
-            {walletAddress ? `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 6)}` : 'Not Connected'}
-          </p>
-        </div>
-
-        {/* Card 2: Live Token Balance */}
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between">
-          <span className="font-sans text-xs font-semibold text-gray-400 tracking-wider uppercase">
-            Total Balance
-          </span>
-          <div className="flex items-baseline space-x-1 mt-2">
-            <span className="font-serif text-2xl font-bold text-gray-900">
-              {balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
-            </span>
-            <span className="font-sans text-xs font-bold text-indigo-600 uppercase">
-              CSPR
-            </span>
-          </div>
-        </div>
-
+    {/* 🎛️ Side-by-Side Wallet & Indicator Row */}
+    <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between gap-3">
+      <div className="min-w-0 flex-1">
+        <span className="font-sans text-[10px] font-semibold text-gray-400 tracking-wider uppercase block">
+          Active Wallet
+        </span>
+        <p className="font-mono text-xs text-gray-700 font-medium break-all mt-1 bg-gray-50 p-1.5 rounded border border-gray-100 truncate">
+          {walletAddress ? `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 6)}` : 'Not Connected'}
+        </p>
       </div>
 
-      {/* 🧠 Card 3: Combined AI Insights & Risk Engine Section */}
-      <div className="bg-gradient-to-br from-gray-50 to-white p-5 rounded-xl border border-gray-100 shadow-sm space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="font-sans text-xs font-semibold text-gray-400 tracking-wider uppercase">
-            AI Agent Diagnostic
-          </span>
-          {/* Dynamic Risk Level Indicator Badge */}
-          <span className={`px-2.5 py-1 text-xs font-bold font-sans rounded-full border ${getRiskBadgeStyles(riskLevel)}`}>
-            {riskLevel}
-          </span>
-        </div>
-
-        <div>
-          <p className="font-sans text-sm text-gray-600 leading-relaxed">
-            {aiAnalysis || "Awaiting transaction analytics from CasperTalk Engine..."}
-          </p>
-        </div>
+      {/* Dynamic Risk Level Indicator Badge right beside it */}
+      <div className="flex flex-col items-end shrink-0">
+        <span className="font-sans text-[10px] font-semibold text-gray-400 tracking-wider uppercase block mb-1">
+          Risk Level
+        </span>
+        <span className={`px-2.5 py-1 text-xs font-bold font-sans rounded-full border ${getRiskBadgeStyles(riskLevel)}`}>
+          {riskLevel}
+        </span>
       </div>
-
     </div>
-  );
+
+    {/* AI Insights Section */}
+    <div className="bg-gradient-to-br from-gray-50 to-white p-3 rounded-xl border border-gray-100 shadow-sm space-y-1">
+      <span className="font-sans text-[10px] font-semibold text-gray-400 tracking-wider uppercase block">
+        AI Agent Diagnostic
+      </span>
+      <p className="font-sans text-xs text-gray-600 leading-relaxed">
+        {aiAnalysis || "Awaiting transaction analytics from CasperTalk Engine..."}
+      </p>
+    </div>
+
+  </div>
+);
 }
