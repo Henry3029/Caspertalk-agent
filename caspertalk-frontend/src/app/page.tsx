@@ -6,12 +6,12 @@ import ChatWindow from '@/components/ChatWindow';
 import ChatInput from '@/components/ChatInput';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-//  Synchronized to match ChatWindow's explicit requirement
+// ✅ Synchronized to match ChatWindow's explicit requirement
 interface Message {
-  id: string; // Made strict since we generate it or fetch it from MongoDB _id
+  id: string; 
   sender: 'user' | 'ai';
   text: string;
-  timestamp: Date; //  Changed from string? to absolute Date
+  timestamp: Date; 
 }
 
 export default function MainDashboardPage() {
@@ -36,13 +36,12 @@ export default function MainDashboardPage() {
           const storedLogs = await response.json();
           
           setHistory(storedLogs.map((msg: any) => ({
-            id: msg._id || crypto.randomUUID(), // Map MongoDB _id safely
+            id: msg._id || crypto.randomUUID(), 
             sender: msg.sender === 'user' ? 'user' : 'ai',
             text: msg.text,
-            timestamp: new Date(msg.createdAt || msg.timestamp || Date.now()) // Clean conversion to Date instance
+            timestamp: new Date(msg.createdAt || msg.timestamp || Date.now()) 
           })));
 
-          // If the latest message contains updated metrics from Casper, apply it to the dashboard
           const latestAiLog = [...storedLogs].reverse().find(msg => msg.sender === 'ai');
           if (latestAiLog && latestAiLog.metrics) {
             setMetrics({
@@ -65,33 +64,33 @@ export default function MainDashboardPage() {
       id: crypto.randomUUID(),
       sender: 'user', 
       text: userText,
-      timestamp: new Date() // Enforces true Date object matching interface
+      timestamp: new Date() 
     };
     
     setHistory((prev) => [...prev, localUserMsg]);
     setIsLoading(true);
 
     try {
+      // ✅ Swapped variables to match your exact parameter scope names!
       const response = await fetch('https://gf55x6-5000.app.github.dev/api/messages', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    sender: 'user',
-    text: inputMessage,
-    publicKey: walletAddress || "" // Pass your wallet state here
-  })
-});
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: 'user',
+          text: userText,             // 👈 Matches 'userText' from the function argument
+          publicKey: userPublicKey    // 👈 Matches your component's 'userPublicKey' variable
+        })
+      });
 
       if (!response.ok) {
-  // Capture status code and any custom error message from backend
-  const errBody = await response.json().catch(() => ({}));
-  throw new Error(`Server Error (${response.status}): ${errBody.error || response.statusText || 'Transmission failed'}`);
-}
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error(`Server Error (${response.status}): ${errBody.error || response.statusText || 'Transmission failed'}`);
+      }
+      
       const data = await response.json();
 
-      // Catch real backend response payload
       if (data.aiResponse) {
         setHistory((prev) => [...prev, {
           id: data.aiResponse._id || crypto.randomUUID(),
@@ -100,7 +99,6 @@ export default function MainDashboardPage() {
           timestamp: new Date()
         }]);
 
-        // Map real chain metrics directly from your live backend controller
         if (data.aiResponse.metrics) {
           setMetrics({
             balance: data.aiResponse.metrics.balance,
@@ -124,34 +122,42 @@ export default function MainDashboardPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100 w-full overflow-hidden">
+    /* 📱 Changed min-h-screen to rigid h-screen for absolute container layout pinning */
+    <div className="h-screen w-full flex flex-col overflow-hidden bg-slate-950 text-slate-100">
+      
+      {/* 📋 FIXED HEADER */}
       <header className="p-4 border-b border-slate-900 bg-slate-900/50 shrink-0 z-10">
         <h1 className="text-xl font-bold text-center">Casper<span className="text-amber-400">Talk AI</span></h1>
       </header>
 
-<div className="shrink-0 bg-white border-b border-gray-100 z-10">
-      <DashboardMetrics 
-        walletAddress={userPublicKey} 
-        balance={metrics.balance} 
-        riskLevel={metrics.riskLevel} 
-        aiAnalysis={metrics.aiAnalysis} 
-        isLoading={isLoading}
-      />
-</div>
+      {/* 📊 FIXED DASHBOARD METRICS */}
+      <div className="shrink-0 z-10">
+        <DashboardMetrics 
+          walletAddress={userPublicKey} 
+          balance={metrics.balance} 
+          riskLevel={metrics.riskLevel} 
+          aiAnalysis={metrics.aiAnalysis} 
+          isLoading={isLoading}
+        />
+      </div>
 
-  <div className="flex-1 min-h-0 w-full relative">
-  <ChatWindow messages={history} />
-</div>
+      {/* 💬 TELEGRAM-STYLE INLINE SCROLL WINDOW */}
+      <div className="flex-1 min-h-0 w-full relative">
+        <ChatWindow messages={history} />
+      </div>
 
       {/* Show an inline subtle indicator if the agent is compiling network data */}
       {isLoading && (
-        <div className="flex items-center gap-2 px-6 py-2 text-xs text-amber-400/70 font-mono animate-pulse">
+        <div className="flex items-center gap-2 px-6 py-2 text-xs text-amber-400/70 font-mono animate-pulse shrink-0">
           <LoadingSpinner />
           <span>Agent parsing Casper state blocks...</span>
         </div>
       )}
 
-      <ChatInput onSendMessage={handleSendMessage} />
+      {/* ⌨️ STICKY INPUT FOOTER */}
+      <div className="shrink-0">
+        <ChatInput onSendMessage={handleSendMessage} />
+      </div>
     </div>
   );
 }
